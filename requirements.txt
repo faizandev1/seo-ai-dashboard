@@ -1,0 +1,10 @@
+google-api-python-client
+google-auth
+google-analytics-data
+python-dotenv
+anthropic
+flask
+plotly
+pandas
+schedule
+requests
