@@ -1,0 +1,806 @@
+# SEO AI DASHBOARD — FULL DOCUMENTATION
+# Developed by Faizan | 2026
+# Version 2.0
+# ============================================================
+
+================================================================
+TABLE OF CONTENTS
+================================================================
+
+1.  Project Overview
+2.  System Requirements
+3.  Installation Guide
+4.  Configuration Guide
+5.  Google API Setup
+6.  Dashboard Sections Explained
+7.  File Structure Reference
+8.  How Data Is Fetched
+9.  Database & History System
+10. PDF Report System
+11. SEO Accountability Tracker
+12. Alert System
+13. KPI Target System
+14. BAT Files Guide (Windows Launch)
+15. Troubleshooting
+16. Security & Privacy
+17. Future Roadmap
+18. License & Ownership
+
+================================================================
+1. PROJECT OVERVIEW
+================================================================
+
+SEO AI Dashboard is a fully automated, professional SEO monitoring
+system built with Python and Flask. It connects directly to Google
+Search Console and Google Analytics 4 using official Google APIs
+and displays 100% real, live data — the same numbers you see when
+you log into Google Search Console or GA4 manually.
+
+PURPOSE:
+This dashboard was built to solve one specific problem — giving a
+business owner full visibility into what their SEO team is actually
+doing, without needing to manually log into multiple platforms or
+read confusing reports.
+
+WHAT IT REPLACES:
+- Manual CSV exports from Google Search Console
+- Logging into GA4 to check traffic numbers
+- Spreadsheets for tracking keyword positions
+- Manual PDF report creation every month
+- Guessing whether the SEO person is working or not
+
+WHAT IT DOES AUTOMATICALLY:
+- Fetches all keyword data from Google Search Console daily
+- Fetches all traffic data from Google Analytics 4 daily
+- Detects problems and shows red flag alerts
+- Compares current period vs previous period automatically
+- Saves historical snapshots to SQLite database
+- Generates professional PDF reports in one click
+- Stores all PDF reports for historical comparison
+
+================================================================
+2. SYSTEM REQUIREMENTS
+================================================================
+
+OPERATING SYSTEM:
+- Windows 10 or Windows 11 (primary)
+- Also works on Mac and Linux (manual launch)
+
+REQUIRED SOFTWARE:
+- Python 3.8 or higher
+  Download: https://www.python.org/downloads/
+  IMPORTANT: During install, check "Add Python to PATH"
+
+- pip (comes with Python automatically)
+
+INTERNET CONNECTION:
+- Required for first data fetch
+- Required every time you refresh data
+- Not required to VIEW the dashboard after data is fetched
+
+GOOGLE ACCOUNTS REQUIRED:
+- Google Search Console access (with your website verified)
+- Google Analytics 4 property set up for your website
+- Google Cloud Project with APIs enabled
+- Service Account with permissions added to both GSC and GA4
+
+RECOMMENDED BROWSER:
+- Google Chrome (best compatibility with charts)
+- Microsoft Edge
+- Firefox
+
+================================================================
+3. INSTALLATION GUIDE
+================================================================
+
+STEP 1 — DOWNLOAD THE PROJECT
+------------------------------
+Option A: Download ZIP from GitHub
+- Go to your GitHub repository
+- Click green "Code" button
+- Click "Download ZIP"
+- Extract to D:\programming\seo model\
+
+Option B: Clone with Git
+  git clone https://github.com/yourusername/seo-ai-dashboard.git
+
+STEP 2 — INSTALL PYTHON PACKAGES
+----------------------------------
+Open CMD (Command Prompt) and type:
+
+  cd /d "D:\programming\seo model"
+  pip install -r requirements.txt
+
+This installs all required packages automatically.
+Wait 2-3 minutes for everything to install.
+
+PACKAGES INSTALLED:
+- google-api-python-client   (Google Search Console API)
+- google-auth                (Google authentication)
+- google-analytics-data      (Google Analytics 4 API)
+- python-dotenv              (reads .env file)
+- anthropic                  (AI analysis via Claude)
+- flask                      (web dashboard server)
+- plotly                     (interactive charts)
+- pandas                     (data processing)
+- schedule                   (auto daily refresh)
+- reportlab                  (PDF generation)
+
+STEP 3 — SET UP YOUR .ENV FILE
+--------------------------------
+Find the file called .env.example in the project folder.
+Make a copy and rename it to .env (no .example at the end).
+
+Open .env with Notepad and fill in your real values:
+
+  GOOGLE_SERVICE_ACCOUNT_KEY=service-account-key.json
+  GSC_PROPERTY_URL=https://www.yourwebsite.com/
+  GA4_PROPERTY_ID=123456789
+  ANTHROPIC_API_KEY=sk-ant-your-key-here
+  SITE_NAME=Your Website Name
+
+STEP 4 — ADD YOUR GOOGLE KEY FILE
+-----------------------------------
+Place your service-account-key.json file in the same folder
+as all the Python files. This file is your Google login key.
+
+STEP 5 — LAUNCH THE DASHBOARD
+--------------------------------
+Windows: Double click START_DASHBOARD.bat
+Manual:  python main.py
+         python dashboard.py
+         Open http://localhost:5000 in browser
+
+================================================================
+4. CONFIGURATION GUIDE
+================================================================
+
+THE .ENV FILE EXPLAINED:
+--------------------------
+
+GOOGLE_SERVICE_ACCOUNT_KEY
+  The filename of your Google service account JSON key file.
+  Default value: service-account-key.json
+  Keep this as is unless you renamed your key file.
+
+GSC_PROPERTY_URL
+  The exact URL of your website as it appears in Google Search Console.
+  Examples:
+    https://www.example.com/
+    https://example.com/
+    http://www.example.com/
+  Note: Include the trailing slash. Include http or https exactly.
+  The dashboard will auto-detect the correct format if unsure.
+
+GA4_PROPERTY_ID
+  Your Google Analytics 4 property ID. Numbers only.
+  Find it: GA4 → Admin → Property Settings → Property ID
+  Example: 500557472
+
+ANTHROPIC_API_KEY
+  Your Claude AI API key for AI-powered analysis.
+  Get it from: https://console.anthropic.com/
+  Format: sk-ant-api03-...
+
+SITE_NAME
+  Display name shown in the dashboard header.
+  Example: best4juniors.nl
+
+
+KPI TARGETS (in config.py):
+------------------------------
+Your 6-month growth targets are stored in config.py.
+You can edit these numbers to match your own goals.
+
+Default targets based on standard SEO growth plan:
+
+  Month 1 organic traffic target:  65 sessions
+  Month 3 organic traffic target:  200 sessions
+  Month 6 organic traffic target:  500 sessions
+
+  Month 1 keywords top 50 target:  115
+  Month 3 keywords top 50 target:  145
+  Month 6 keywords top 50 target:  225
+
+  Month 1 DA target:               3
+  Month 3 DA target:               6
+  Month 6 DA target:               12
+
+================================================================
+5. GOOGLE API SETUP
+================================================================
+
+STEP A — CREATE GOOGLE CLOUD PROJECT
+--------------------------------------
+1. Go to: https://console.cloud.google.com/
+2. Click "New Project"
+3. Name it: seo-dashboard
+4. Click Create
+
+STEP B — ENABLE REQUIRED APIS
+-------------------------------
+In your Google Cloud Project:
+1. Go to APIs & Services → Library
+2. Search and enable: "Google Search Console API"
+3. Search and enable: "Google Analytics Data API"
+
+STEP C — CREATE SERVICE ACCOUNT
+---------------------------------
+1. Go to APIs & Services → Credentials
+2. Click "Create Credentials" → "Service Account"
+3. Name it: seo-dashboard-bot
+4. Click Done
+5. Click on the service account you just created
+6. Go to "Keys" tab → Add Key → JSON
+7. Download the JSON file
+8. Rename it to: service-account-key.json
+9. Place it in your project folder
+
+STEP D — ADD TO GOOGLE SEARCH CONSOLE
+---------------------------------------
+1. Go to: https://search.google.com/search-console/
+2. Select your website property
+3. Click Settings (gear icon)
+4. Click "Users and permissions"
+5. Click "Add user"
+6. Enter your service account email
+   Format: name@projectid.iam.gserviceaccount.com
+7. Set permission to: Full
+8. Click Add
+
+STEP E — ADD TO GOOGLE ANALYTICS 4
+-------------------------------------
+1. Go to: https://analytics.google.com/
+2. Click Admin (gear icon bottom left)
+3. Under Property column: click "Property Access Management"
+4. Click + button (top right)
+5. Enter your service account email
+6. Set role to: Viewer
+7. Click Add
+
+================================================================
+6. DASHBOARD SECTIONS EXPLAINED
+================================================================
+
+OVERVIEW (Home Page)
+----------------------
+The main dashboard showing all key metrics at a glance.
+
+WHAT YOU SEE:
+- Alert banners at the top (red = critical, yellow = warning, green = good)
+- 9 KPI metric cards showing real numbers from GSC and GA4
+- Each card shows current value vs previous period with % change
+- Clicks vs Impressions bar chart comparing current to previous period
+- Traffic Sources donut chart showing all GA4 channels
+- Keyword Position Distribution bar chart
+- KPI Target Tracker showing progress toward 6-month goals
+
+HOW TO USE:
+Use the date filter buttons at the top right (3D / 7D / 28D / 90D)
+to change the time period. All cards and charts update automatically.
+
+
+KEYWORDS SECTION
+-----------------
+Full keyword analysis with 6 filtered views.
+
+TABS:
+All Keywords  — Every keyword GSC is tracking with position, clicks, CTR
+Improved      — Keywords that moved up in position vs last period
+Declined      — Keywords that dropped in position vs last period
+Page 2 Wins   — Keywords on position 11-20 (easy wins for page 1)
+Dying         — Keywords below position 50 (need content work)
+Low CTR       — High impressions but very low click rate (fix meta titles)
+
+COLUMNS EXPLAINED:
+- Position: Current average position in Google search results
+- Change: How many positions moved up (green) or down (red) vs last period
+- Clicks: Number of times people clicked your result
+- Impressions: Number of times your result appeared in search
+- CTR: Click-through rate (clicks divided by impressions)
+- Status: Top 3 / Top 10 / Page 2 / Dying
+
+
+TRAFFIC SECTION
+----------------
+Full Google Analytics 4 traffic analysis.
+
+WHAT YOU SEE:
+- Daily Sessions line chart showing traffic over time
+- Channel breakdown pie chart
+- Traffic by Channel table with vs previous period comparison
+- Top Pages table showing which pages get the most visits
+
+CHANNELS EXPLAINED:
+- Organic Search: People who found you through Google (free)
+- Paid Social: People who came from paid social media ads
+- Direct: People who typed your URL directly
+- Referral: People who clicked a link from another website
+- Organic Social: People who came from free social media posts
+
+
+COMPARE PERIODS SECTION
+-------------------------
+Side-by-side comparison of any two time periods.
+
+WHAT YOU SEE:
+- Current Period vs Previous Period: All key metrics side by side
+- Progress vs Baseline: Your numbers vs where you started (Feb 2026)
+- Historical Trend Chart: Clicks and sessions over all saved snapshots
+- Keyword Count Trend: Total keywords and Top 10 over time
+
+HOW TO USE:
+This section automatically pulls from your SQLite database.
+Every time you fetch data, a snapshot is saved.
+After a few weeks you will see real trend lines appear.
+
+
+SEO ACCOUNTABILITY SECTION
+----------------------------
+Track what your SEO person is actually delivering each month.
+
+LEFT PANEL — Live SEO Metrics:
+Shows your real current numbers with progress bars toward targets.
+Fetched automatically from Google — cannot be faked.
+
+RIGHT PANEL — KPI Target Progress:
+Shows how close you are to Month 1 targets for each metric.
+
+MONTHLY DELIVERABLES FORM:
+You fill this in once per month based on what your SEO person reported:
+- Backlinks Built: How many new backlinks were created
+- Backlink URLs: Paste the actual URLs so you can verify them
+- Blog Posts: How many new posts were published
+- Blog Post Titles: Paste the titles
+- Domain Authority: Check on Semrush.com monthly
+- Technical Fixes: What technical issues were fixed
+- Notes: Anything else worth recording
+
+RED FLAGS PANEL:
+Auto-detects if your SEO person is not delivering results.
+Based on real data from GSC and GA4 combined with what you entered.
+
+
+REPORTS SECTION
+----------------
+Generate and manage professional PDF reports.
+
+GENERATE PDF BUTTON:
+Click once — dashboard automatically creates a professional PDF
+containing all current metrics, keyword data, traffic breakdown,
+and monthly deliverables you entered.
+
+REPORT ARCHIVE:
+Every PDF generated is saved automatically to the database.
+You can download any past report at any time.
+Compare March report vs April report to see real progress.
+
+================================================================
+7. FILE STRUCTURE REFERENCE
+================================================================
+
+ROOT FOLDER:
+  START_DASHBOARD.bat     Windows launcher — double click to start
+  STOP_DASHBOARD.bat      Stops the running dashboard
+  FETCH_DATA.bat          Manually triggers a fresh data fetch
+  dashboard.py            Main Flask web application
+  main.py                 Master data fetcher (GSC + GA4)
+  config.py               Settings, targets, and baselines
+  database.py             SQLite database manager
+  alerts.py               Auto alert detection logic
+  report_gen.py           PDF report generator (ReportLab)
+  scheduler.py            Auto daily fetch at 08:00
+  requirements.txt        All Python package dependencies
+  README.md               GitHub project readme
+  DOCUMENTATION.txt       This file
+  .env                    Your private credentials (never share)
+  .env.example            Template for .env (safe to share)
+  .gitignore              Tells Git what files to never upload
+  service-account-key.json  Google API key (never share)
+
+FETCHERS FOLDER:
+  fetchers/
+    __init__.py           Makes fetchers a Python package
+    fetch_gsc.py          Google Search Console data fetcher
+    fetch_ga4.py          Google Analytics 4 data fetcher
+
+DATA FOLDER (auto-created, gitignored):
+  data/
+    gsc/data.json         Latest GSC fetch results
+    ga4/data.json         Latest GA4 fetch results
+    history/              Reserved for future use
+    reports/              All generated PDF reports
+    seo_history.db        SQLite database with all snapshots
+
+================================================================
+8. HOW DATA IS FETCHED
+================================================================
+
+GOOGLE SEARCH CONSOLE DATA:
+When you run main.py or click Refresh Data in the dashboard,
+the system connects to Google Search Console API and downloads:
+
+- All keywords Google is tracking for your site
+- For each keyword: position, clicks, impressions, CTR
+- Previous period data for comparison
+- Page-level performance data
+- Summary totals (total clicks, impressions, avg position)
+
+The system auto-detects your correct GSC property URL format
+so you don't need to worry about http vs https or trailing slashes.
+
+Up to 1000 keywords are downloaded per fetch.
+
+GOOGLE ANALYTICS 4 DATA:
+Connects to GA4 Data API and downloads:
+
+- Sessions and users by channel (Organic, Paid, Direct, etc.)
+- Previous period channel data for comparison
+- Top pages by traffic (up to 200 pages)
+- Daily sessions and users for trend chart
+- Summary totals
+
+DATA IS SAVED LOCALLY:
+All fetched data is saved as JSON files in the data/ folder.
+This means the dashboard can work offline after the first fetch.
+The data only updates when you click Refresh or run main.py.
+
+DATABASE SNAPSHOTS:
+Every time you fetch data, the summary metrics are also saved
+as a snapshot in the SQLite database. This builds up your
+historical trend data over time automatically.
+
+================================================================
+9. DATABASE & HISTORY SYSTEM
+================================================================
+
+DATABASE FILE: data/seo_history.db
+
+TABLES:
+
+snapshots
+  Saves a summary record every time data is fetched.
+  Columns: date, clicks, impressions, CTR, position,
+           keywords total, top10, top50, organic sessions,
+           total sessions, backlinks, DA score, blog posts.
+  Used for: Historical trend charts in Compare section.
+
+keyword_history
+  Saves position data for all keywords each fetch.
+  Columns: date, keyword, position, clicks, impressions, CTR.
+  Used for: Keyword position history tracking over time.
+
+reports
+  Saves a record of every PDF report generated.
+  Columns: date, title, period, filename, filepath, data snapshot.
+  Used for: Report archive and historical comparison.
+
+accountability
+  Saves monthly SEO deliverables you enter manually.
+  Columns: month, backlinks built, backlink URLs, blog posts,
+           blog titles, DA score, technical fixes, notes.
+  Used for: SEO accountability tracker and PDF reports.
+
+BACKUP YOUR DATABASE:
+Copy data/seo_history.db to a safe location monthly.
+This file contains all your historical SEO data.
+
+================================================================
+10. PDF REPORT SYSTEM
+================================================================
+
+HOW TO GENERATE A REPORT:
+1. Go to Reports section in the dashboard
+2. Click "Generate PDF Report" button
+3. Wait 3-5 seconds
+4. PDF downloads automatically
+5. Report is saved to database archive
+
+WHAT THE PDF CONTAINS:
+- Report title with website name and date range
+- KPI table: All key metrics current vs previous period with % change
+- Top 20 keywords by clicks with position and CTR
+- Page 2 keywords (quick win opportunities)
+- Traffic by channel breakdown
+- Monthly SEO deliverables (from accountability form)
+
+PDF DESIGN:
+Professional A4 layout with:
+- Blue header with report title
+- Clean data tables with alternating row colors
+- Color coded status indicators
+- Footer with website name and generation date
+
+REPORT ARCHIVE:
+Every generated PDF is automatically saved to:
+  data/reports/SEO_Report_Month_Year_Time.pdf
+
+And recorded in the database with:
+- Generation timestamp
+- Report title
+- Time period covered
+- Snapshot of all metrics at time of generation
+
+You can download any past report from the Reports section.
+
+================================================================
+11. SEO ACCOUNTABILITY TRACKER
+================================================================
+
+PURPOSE:
+This section exists to answer one question:
+"Is my SEO person actually doing the work they promised?"
+
+HOW IT WORKS:
+1. Live metrics panel shows REAL numbers from Google
+   (These cannot be faked — they come directly from GSC and GA4)
+
+2. You fill in the monthly form with what your SEO person reported:
+   - How many backlinks did they build?
+   - Paste the actual URLs so you can verify they are real
+   - How many blog posts did they publish?
+   - What was the Domain Authority this month?
+
+3. The Red Flags panel compares what they reported vs what
+   the real Google data shows. Mismatches are highlighted.
+
+RED FLAG TRIGGERS:
+- Organic traffic still under 50 after 3 months = problem
+- Fewer than 5 backlinks built in a month = not enough
+- Fewer than 2 blog posts published = not enough
+- No new keywords entering Top 50 = strategy not working
+- Keywords declining month over month = work not effective
+
+WHAT TO DO WITH RED FLAGS:
+If you see red flags consistently for 2-3 months:
+1. Ask your SEO person to explain specifically why
+2. Request to see the actual backlink URLs (verify they are real sites)
+3. Request Google Search Console screenshots showing improvement
+4. Consider changing your SEO strategy or provider
+
+================================================================
+12. ALERT SYSTEM
+================================================================
+
+ALERTS APPEAR AT THE TOP OF OVERVIEW PAGE.
+
+CRITICAL ALERTS (Red):
+These need immediate attention.
+
+  Clicks dropped 20%+ vs previous period
+  Organic traffic critically low (under 50 sessions)
+  Organic traffic dropped 20%+ vs previous period
+
+WARNING ALERTS (Yellow):
+These need attention soon.
+
+  Impressions down 15%+ (Google showing site less)
+  Average position worsened by 2+ positions
+  23+ keywords with over 100 impressions but CTR below 1%
+  20+ keywords dropped below position 50
+
+POSITIVE ALERTS (Green):
+Signs that SEO is working.
+
+  Clicks up 10%+ vs previous period
+  8+ keywords ranking in Top 10
+  No critical issues detected
+
+ALERT LOGIC:
+All alerts are calculated automatically by comparing
+current period data to previous period data.
+No manual configuration needed.
+
+================================================================
+13. KPI TARGET SYSTEM
+================================================================
+
+TARGETS ARE SET IN config.py.
+
+These represent your 6-month SEO growth plan milestones.
+Every metric has three targets: Month 1, Month 3, Month 6.
+
+BASELINE (Starting Point — Feb 2026):
+  Organic Traffic:    29 sessions/month
+  Domain Authority:   2
+  Backlinks:          11
+  Keywords Top 50:    103
+  Keywords Top 10:    5
+  GA4 Sessions:       70
+  GSC Clicks/28d:     51
+
+6-MONTH TARGETS:
+  Metric              Month 1   Month 3   Month 6
+  Organic Traffic     65        200       500
+  DA Score            3         6         12
+  Backlinks           25        50        100
+  Keywords Top 50     115       145       225
+  Keywords Top 10     10        20        40
+  GA4 Sessions        140       350       850
+  GSC Clicks/28d      90        250       600
+
+STATUS COLORS:
+  Green  = At or above target
+  Yellow = Within 70% of target (getting close)
+  Red    = Below 70% of target (needs attention)
+
+TO UPDATE TARGETS:
+Open config.py in Notepad and edit the KPI_TARGETS dictionary.
+Save the file and restart the dashboard.
+
+================================================================
+14. BAT FILES GUIDE (WINDOWS LAUNCH)
+================================================================
+
+START_DASHBOARD.bat
+  Double click to launch everything.
+  What it does step by step:
+  1. Checks Python is installed
+  2. Goes to the correct folder
+  3. Installs any missing packages
+  4. Kills any old dashboard running on port 5000
+  5. Fetches fresh data from Google in background
+  6. Waits 3 seconds for data to load
+  7. Opens http://localhost:5000 in your browser
+  8. Starts the dashboard server minimized
+
+FETCH_DATA.bat
+  Manually refreshes data from Google.
+  Use this anytime you want updated numbers without restarting.
+  Shows fetch progress in CMD window.
+  Press any key to close when done.
+
+STOP_DASHBOARD.bat
+  Stops the dashboard server.
+  Use before shutting down or if port 5000 has an error.
+  Closes all Python processes.
+
+================================================================
+15. TROUBLESHOOTING
+================================================================
+
+PROBLEM: Browser does not open automatically
+SOLUTION: Manually open http://localhost:5000 in Chrome
+
+PROBLEM: Dashboard shows no data / empty cards
+SOLUTION: Run FETCH_DATA.bat first to get data from Google
+          Then refresh the browser (F5)
+
+PROBLEM: "Python not found" error
+SOLUTION: Reinstall Python from python.org
+          During install check "Add Python to PATH"
+          Close and reopen CMD after installing
+
+PROBLEM: "pip not found" error
+SOLUTION: Python not installed correctly
+          Reinstall Python with "Add to PATH" checked
+
+PROBLEM: GSC shows 0 keywords or permission error
+SOLUTION: Service account email not added to Search Console
+          Go to GSC → Settings → Users → Add your service account email
+          Set permission to Full
+
+PROBLEM: GA4 shows 0 sessions
+SOLUTION: Service account not added to GA4
+          Go to GA4 → Admin → Property Access Management
+          Add service account email with Viewer role
+
+PROBLEM: "Port 5000 already in use" error
+SOLUTION: Run STOP_DASHBOARD.bat first
+          Then run START_DASHBOARD.bat again
+
+PROBLEM: Charts not loading
+SOLUTION: Check internet connection (Plotly loads from CDN)
+          Try refreshing browser (F5)
+          Try Chrome if using another browser
+
+PROBLEM: PDF generation fails
+SOLUTION: Make sure reportlab is installed:
+          pip install reportlab
+          Make sure data/reports/ folder exists (created automatically)
+
+PROBLEM: Git push rejected
+SOLUTION: Run: git push --force
+          This overwrites GitHub with your local files
+
+PROBLEM: .env file not loading
+SOLUTION: Make sure file is named exactly .env (no .txt extension)
+          Make sure file is in the same folder as dashboard.py
+          Check there are no spaces around the = signs
+
+================================================================
+16. SECURITY & PRIVACY
+================================================================
+
+FILES THAT MUST NEVER BE SHARED:
+  .env                      Contains your API keys
+  service-account-key.json  Contains your Google access key
+
+THESE ARE PROTECTED BY .gitignore:
+Git will never upload these files to GitHub automatically.
+
+WHAT IS SAFE TO SHARE / UPLOAD TO GITHUB:
+  All .py files
+  .env.example
+  requirements.txt
+  README.md
+  DOCUMENTATION.txt
+  .gitignore
+  .bat files
+
+YOUR DATA STAYS LOCAL:
+All fetched data is stored on your own computer only.
+The dashboard does not send your data anywhere.
+Only Google API calls go out to the internet.
+
+GOOGLE API PERMISSIONS:
+Service account has READ ONLY access to GSC and GA4.
+It cannot modify your website, settings, or data.
+It can only read analytics data.
+
+================================================================
+17. FUTURE ROADMAP
+================================================================
+
+PLANNED FEATURES (Not yet built):
+
+v3.0 — Competitor Tracking
+  Track competitor keyword rankings alongside your own.
+
+v3.0 — Backlink Verification
+  Automatically verify if entered backlink URLs are real and live.
+
+v3.0 — Google Ads Integration
+  Pull paid campaign data alongside organic data.
+
+v3.0 — Email Alerts
+  Send email when critical alerts are detected.
+
+v3.0 — Semrush Integration
+  Auto-pull Domain Authority score from Semrush API.
+
+v3.0 — Multi-Website Support
+  Monitor multiple websites from one dashboard.
+
+v3.0 — AI Analysis Mode
+  Ask questions about your SEO data in plain English.
+  Example: "Why did my traffic drop last week?"
+
+================================================================
+18. LICENSE & OWNERSHIP
+================================================================
+
+Copyright (c) 2026 Faizan. All Rights Reserved.
+
+This software and all associated source code, documentation,
+configuration files, and related materials are the exclusive
+proprietary property of Faizan.
+
+YOU MAY NOT:
+  - Copy, reproduce, or duplicate this software or any part of it
+  - Modify, adapt, or create derivative works based on this software
+  - Distribute, publish, or make this software available to any third party
+  - Use this software for any commercial purpose without explicit written
+    permission from the owner
+  - Sublicense, sell, rent, or transfer any rights to this software
+  - Reverse engineer, decompile, or disassemble any part of this software
+  - Remove or alter any copyright notices or ownership markings
+
+TO REQUEST PERMISSION:
+Contact Faizan directly with a detailed description of your
+intended use before using any part of this project.
+
+VIOLATION:
+Unauthorized use, copying, or distribution of this software
+is strictly prohibited and may result in civil and criminal
+legal action to the fullest extent permitted by law.
+
+All rights reserved worldwide.
+
+================================================================
+END OF DOCUMENTATION
+================================================================
+
+SEO AI Dashboard v2.0
+Developed by Faizan | 2026
+================================================================
